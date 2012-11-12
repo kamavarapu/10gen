@@ -38,6 +38,8 @@ def insert_entry(title, post, tags_array, author):
         # do something with the post
 
         print "Inserting the post"
+        post_id = posts.insert(post)
+        permalink = posts.find({'_id': post_id}, {'_id': 0, 'permalink': 1})
 
         # End student work
 
@@ -59,8 +61,7 @@ def blog_index():
     # XXX HW 3.2 Work Here
     # Find the last ten most recent posts, sorted from newest to oldest
 
-    cursor = [] # so this code won't crash before you add your stuff - you can remove
-       
+    cursor = posts.find().sort([('date', pymongo.DESCENDING)]).limit(10)
     
     # End Student Work
 
@@ -101,7 +102,7 @@ def show_post(permalink="notfound"):
     # XXX HW 3.2 Work here
     # find a post that has the appropriate permalink
     
-    post = None
+    post = posts.find_one({'permalink': permalink})
 
     # end student work
     if post == None:
@@ -139,7 +140,7 @@ def post_newcomment():
     permalink = cgi.escape(permalink)
 
     # XXX HW 3.3 - Find the post that matches the permalink.
-    post = None  # Replace this line with your work.
+    post = posts.find_one({'permalink': permalink})
 
     # if post not found, redirct to post not found error
     if post == None:
@@ -179,8 +180,13 @@ def post_newcomment():
             
             # your update here.
             print "about to update a blog post with a comment"
+            if 'comments' not in post.keys():
+                post['comments'] = []
+
+            post['comments'].append(comment)
+            posts.save(post)
             
-            #print "num documents updated" + last_error['n']
+            print "num documents updated" + last_error['n']
         except:
             print "Could not update the collection, error"
             print "Unexpected error:", sys.exc_info()[0]
