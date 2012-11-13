@@ -39,7 +39,7 @@ def insert_entry(title, post, tags_array, author):
 
         print "Inserting the post"
         post_id = posts.insert(post)
-        permalink = posts.find({'_id': post_id}, {'_id': 0, 'permalink': 1})
+        permalink = posts.find_one({'_id': post_id}, {'_id': 0, 'permalink': 1})
 
         # End student work
 
@@ -47,7 +47,7 @@ def insert_entry(title, post, tags_array, author):
         print "Error inserting post"
         print "Unexpected error:", sys.exc_info()[0]
 
-    return permalink
+    return permalink['permalink']
     
 
 @bottle.route('/')
