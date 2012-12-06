@@ -1,0 +1,84 @@
+// HW1: 
+
+db.posts.aggregate([{$unwind: '$comments'}, {$group: {_id: '$comments.author', count: {$sum: 1}}}])
+
+// HW2: 
+
+db.zips.aggregate([	
+	{$match: {state: {$in: ["NY", "CA"]}}},
+	{$group: {_id: {state: '$state', city: '$city'}, citypop: {$sum: "$pop"}}},
+	{$match: {citypop: {$gt: 25000}}},
+	{$group: {_id: null, totalaverage: {$avg: "$citypop"}}}
+	])
+
+{
+        "city" : "ACMAR",
+        "loc" : [
+                -86.51557,
+                33.584132
+        ],
+        "pop" : 6055,
+        "state" : "AL",
+        "_id" : "35004"
+}
+
+// HW3:
+
+db.grades.aggregate([
+	{$unwind: '$scores'},
+	{$match: {'scores.type': {$ne: 'quiz'}}},
+	{$group: {_id: {studentid: '$student_id', classid: '$class_id'}, studentavg: {$avg: '$scores.score'}}},
+	{$group: {_id: '$_id.classid', classavg: {$avg: '$studentavg'}}},
+	{$sort: {'$classavg': -1}}
+	])
+
+{
+	"_id" : ObjectId("50b59cd75bed76f46522c392"),
+	"student_id" : 10,
+	"class_id" : 5,
+	"scores" : [
+		{
+			"type" : "exam",
+			"score" : 69.17634380939022
+		},
+		{
+			"type" : "quiz",
+			"score" : 61.20182926719762
+		},
+		{
+			"type" : "homework",
+			"score" : 73.3293624199466
+		},
+		{
+			"type" : "homework",
+			"score" : 15.206314042622903
+		},
+		{
+			"type" : "homework",
+			"score" : 36.75297723087603
+		},
+		{
+			"type" : "homework",
+			"score" : 64.42913107330241
+		}
+	]
+}
+
+// HW4:
+
+db.zips.aggregate([
+    {$project: { _id: 0, zipcode: "$_id", first_char: {$substr : ["$city",0,1]}, pop: 1, city: 1 }},
+    {$match: {"first_char": {$in: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]}}},
+    {$group: {_id: null, totalpop: {$sum: "$pop"}}}
+])
+
+{
+        "city" : "ACMAR",
+        "loc" : [
+                -86.51557,
+                33.584132
+        ],
+        "pop" : 6055,
+        "state" : "AL",
+        "_id" : "35004"
+}
